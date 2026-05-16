@@ -34,6 +34,16 @@ CREATE TABLE IF NOT EXISTS plans (
 )
 """
 
+_LEADS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS leads (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    user_input TEXT NOT NULL,
+    source TEXT NOT NULL,
+    created_at TEXT NOT NULL
+)
+"""
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -47,7 +57,19 @@ class PlanRepository:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute(_SCHEMA)
+            await db.execute(_LEADS_SCHEMA)
             await db.commit()
+
+    async def save_lead(self, email: str, user_input: str, source: str) -> str:
+        lead_id = str(uuid4())
+        async with aiosqlite.connect(self.db_path) as db:
+            await db.execute(
+                "INSERT INTO leads (id, email, user_input, source, created_at) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (lead_id, email, user_input, source, _now()),
+            )
+            await db.commit()
+        return lead_id
 
     async def create(self, user_input: str) -> str:
         plan_id = str(uuid4())
