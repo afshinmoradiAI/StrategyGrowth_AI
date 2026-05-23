@@ -14,9 +14,20 @@ class Settings(BaseSettings):
     default_model: str = "claude-sonnet-4-5"
     log_level: str = "INFO"
     max_tokens: int = 4096
-    # Empty value disables auth (dev mode). Set in production.
+    max_output_tokens_per_call: int = 8192
+    enable_message_cache: bool = True
     app_api_key: str = ""
     db_path: Path = DEFAULT_DB_PATH
+    secret_key: str = "dev-secret-change-in-production"
+
+    # Rate limits
+    rate_limit_default: str = "30/minute"
+    rate_limit_anonymous: str = "10/minute"
+
+    # Retries
+    agent_max_retries: int = 3
+    agent_retry_min_seconds: float = 1.0
+    agent_retry_max_seconds: float = 10.0
 
 
 _settings: Settings | None = None

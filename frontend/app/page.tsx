@@ -12,6 +12,7 @@ import {
   RoadmapView,
   StrategyView,
 } from "./_components/Views";
+import { authHeaders, getToken } from "./_lib/auth";
 import { streamSse } from "./_lib/sse";
 import type {
   AgentName,
@@ -57,6 +58,22 @@ const TOOLS = [
     tag: "Pro",
     tagColor: "bg-blue-100 text-blue-700",
   },
+  {
+    href: "/leads",
+    emoji: "🎯",
+    title: "AI Lead Finder",
+    desc: "Discover real businesses, score them, draft 3-touch outreach.",
+    tag: "Growth",
+    tagColor: "bg-emerald-100 text-emerald-700",
+  },
+  {
+    href: "/dashboard",
+    emoji: "📁",
+    title: "Saved Plans Dashboard",
+    desc: "View, download PDF, and chat with your past plans.",
+    tag: "Hub",
+    tagColor: "bg-blue-100 text-blue-700",
+  },
 ];
 
 export default function Home() {
@@ -75,6 +92,7 @@ export default function Home() {
   const [strategy, setStrategy] = useState<Strategy | null>(null);
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [risks, setRisks] = useState<RiskRegister | null>(null);
+  const [planId, setPlanId] = useState<string | null>(null);
 
   function reset() {
     setBrief(null);
@@ -82,6 +100,7 @@ export default function Home() {
     setStrategy(null);
     setRoadmap(null);
     setRisks(null);
+    setPlanId(null);
     setStatuses({
       intake: "idle",
       research: "idle",
@@ -101,7 +120,9 @@ export default function Home() {
         `${API}/api/plan`,
         { user_input: input },
         (name, data) => {
-          if (name === "agent_start") {
+          if (name === "plan_created") {
+            setPlanId(data.plan_id as string);
+          } else if (name === "agent_start") {
             const agent = data.agent as AgentName;
             setStatuses((s) => ({ ...s, [agent]: "running" }));
           } else if (name === "agent_complete") {
@@ -119,6 +140,7 @@ export default function Home() {
             setError((data.message as string) ?? "Pipeline error");
           }
         },
+        authHeaders(),
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -173,7 +195,7 @@ export default function Home() {
           <h2 className="text-center text-sm font-semibold uppercase tracking-widest text-blue-600 mb-6">
             Standalone Tools
           </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {TOOLS.map((t) => (
               <Link
                 key={t.href}
@@ -241,6 +263,20 @@ export default function Home() {
         {error && (
           <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {error}
+          </div>
+        )}
+
+        {planId && getToken() && !running && (
+          <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 flex items-center justify-between flex-wrap gap-3">
+            <div className="text-sm text-blue-900">
+              ✓ Plan saved to your dashboard — open it for PDF export & AI chat.
+            </div>
+            <Link
+              href={`/plans/${planId}`}
+              className="rounded-xl bg-blue-700 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-800"
+            >
+              Open plan →
+            </Link>
           </div>
         )}
 

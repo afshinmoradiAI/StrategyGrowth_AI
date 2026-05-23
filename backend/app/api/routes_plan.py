@@ -7,6 +7,7 @@ from app.core.auth import require_api_key
 from app.core.db import PlanRepository, get_repository
 from app.core.logging import get_logger
 from app.core.orchestrator import Orchestrator, get_orchestrator
+from app.core.security import optional_user
 from app.schemas.intake import IntakeRequest
 
 router = APIRouter(prefix="/api", tags=["plan"], dependencies=[Depends(require_api_key)])
@@ -18,6 +19,7 @@ async def create_plan(
     req: IntakeRequest,
     orch: Orchestrator = Depends(get_orchestrator),
     repo: PlanRepository = Depends(get_repository),
+    user: dict | None = Depends(optional_user),
 ) -> StreamingResponse:
     """Run the full planning pipeline. Streams progress as Server-Sent Events.
 
@@ -26,7 +28,7 @@ async def create_plan(
     """
 
     async def event_stream():
-        plan_id = await repo.create(req.user_input)
+        plan_id = await repo.create(req.user_input, user_id=user["sub"] if user else None)
         yield (
             "event: plan_created\n"
             f"data: {json.dumps({'plan_id': plan_id})}\n\n"

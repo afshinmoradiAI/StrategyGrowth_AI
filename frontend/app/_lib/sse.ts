@@ -4,10 +4,11 @@ export async function streamSse(
   url: string,
   body: unknown,
   onEvent: SseHandler,
+  extraHeaders?: Record<string, string>,
 ): Promise<void> {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...extraHeaders },
     body: JSON.stringify(body),
   });
   if (!res.ok || !res.body) {

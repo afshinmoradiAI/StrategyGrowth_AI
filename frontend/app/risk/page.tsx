@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AuthGuard } from "../_components/AuthGuard";
 import { Nav } from "../_components/Nav";
 import {
   BriefView,
@@ -10,6 +11,7 @@ import {
   RiskView,
   StrategyView,
 } from "../_components/Views";
+import { authHeaders } from "../_lib/auth";
 import { streamSse } from "../_lib/sse";
 import type {
   AgentName,
@@ -28,7 +30,7 @@ const AGENTS: { key: AgentName; label: string }[] = [
   { key: "risk", label: "Risks" },
 ];
 
-export default function RiskPage() {
+function RiskTool() {
   const [input, setInput] = useState("");
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,21 +52,26 @@ export default function RiskPage() {
     setStatuses({ intake: "idle", research: "idle", strategy: "idle", plan: "idle", risk: "idle" });
     setRunning(true);
     try {
-      await streamSse(`${API}/api/standalone/risk`, { user_input: input }, (name, data) => {
-        if (name === "agent_start") {
-          setStatuses((s) => ({ ...s, [data.agent as AgentName]: "running" }));
-        } else if (name === "agent_complete") {
-          const agent = data.agent as AgentName;
-          const result = data.result as Record<string, unknown>;
-          setStatuses((s) => ({ ...s, [agent]: "complete" }));
-          if (agent === "intake") setBrief(result as unknown as ProjectBrief);
-          if (agent === "research") setResearch(result as unknown as ResearchFindings);
-          if (agent === "strategy") setStrategy(result as unknown as Strategy);
-          if (agent === "risk") setRisks(result as unknown as RiskRegister);
-        } else if (name === "error") {
-          setError((data.message as string) ?? "Error");
-        }
-      });
+      await streamSse(
+        `${API}/api/standalone/risk`,
+        { user_input: input },
+        (name, data) => {
+          if (name === "agent_start") {
+            setStatuses((s) => ({ ...s, [data.agent as AgentName]: "running" }));
+          } else if (name === "agent_complete") {
+            const agent = data.agent as AgentName;
+            const result = data.result as Record<string, unknown>;
+            setStatuses((s) => ({ ...s, [agent]: "complete" }));
+            if (agent === "intake") setBrief(result as unknown as ProjectBrief);
+            if (agent === "research") setResearch(result as unknown as ResearchFindings);
+            if (agent === "strategy") setStrategy(result as unknown as Strategy);
+            if (agent === "risk") setRisks(result as unknown as RiskRegister);
+          } else if (name === "error") {
+            setError((data.message as string) ?? "Error");
+          }
+        },
+        authHeaders(),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -75,7 +82,6 @@ export default function RiskPage() {
   return (
     <>
       <Nav active="/risk" />
-
       <div
         className="relative bg-blue-900"
         style={{
@@ -91,8 +97,7 @@ export default function RiskPage() {
             Risk Register Generator
           </h1>
           <p className="mt-4 text-xl text-blue-100 max-w-xl mx-auto">
-            Investor-ready risk register with likelihood, impact ratings, and
-            mitigation strategies.
+            Investor-ready risk register with likelihood, impact ratings, and mitigation strategies.
           </p>
         </div>
       </div>
@@ -123,23 +128,15 @@ export default function RiskPage() {
               >
                 {running ? "Analysing risks…" : "Generate risk register →"}
               </button>
-              {running && (
-                <span className="text-sm text-blue-600 animate-pulse">
-                  AI agents are working…
-                </span>
-              )}
+              {running && <span className="text-sm text-blue-600 animate-pulse">AI agents are working…</span>}
             </div>
           </form>
-
           <PipelineProgress agents={AGENTS} statuses={statuses} />
         </div>
 
         {error && (
-          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
+          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
         )}
-
         {brief && <BriefView brief={brief} />}
         {research && <ResearchView r={research} />}
         {strategy && <StrategyView s={strategy} />}
@@ -150,5 +147,13 @@ export default function RiskPage() {
         © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
       </footer>
     </>
+  );
+}
+
+export default function RiskPage() {
+  return (
+    <AuthGuard>
+      <RiskTool />
+    </AuthGuard>
   );
 }

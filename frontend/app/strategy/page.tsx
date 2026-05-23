@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AuthGuard } from "../_components/AuthGuard";
 import { Nav } from "../_components/Nav";
 import {
   BriefView,
@@ -9,6 +10,7 @@ import {
   ResearchView,
   StrategyView,
 } from "../_components/Views";
+import { authHeaders } from "../_lib/auth";
 import { streamSse } from "../_lib/sse";
 import type {
   AgentName,
@@ -25,7 +27,7 @@ const AGENTS: { key: AgentName; label: string }[] = [
   { key: "strategy", label: "Strategy" },
 ];
 
-export default function StrategyPage() {
+function StrategyTool() {
   const [input, setInput] = useState("");
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,20 +47,25 @@ export default function StrategyPage() {
     setStatuses({ intake: "idle", research: "idle", strategy: "idle", plan: "idle", risk: "idle" });
     setRunning(true);
     try {
-      await streamSse(`${API}/api/standalone/strategy`, { user_input: input }, (name, data) => {
-        if (name === "agent_start") {
-          setStatuses((s) => ({ ...s, [data.agent as AgentName]: "running" }));
-        } else if (name === "agent_complete") {
-          const agent = data.agent as AgentName;
-          const result = data.result as Record<string, unknown>;
-          setStatuses((s) => ({ ...s, [agent]: "complete" }));
-          if (agent === "intake") setBrief(result as unknown as ProjectBrief);
-          if (agent === "research") setResearch(result as unknown as ResearchFindings);
-          if (agent === "strategy") setStrategy(result as unknown as Strategy);
-        } else if (name === "error") {
-          setError((data.message as string) ?? "Error");
-        }
-      });
+      await streamSse(
+        `${API}/api/standalone/strategy`,
+        { user_input: input },
+        (name, data) => {
+          if (name === "agent_start") {
+            setStatuses((s) => ({ ...s, [data.agent as AgentName]: "running" }));
+          } else if (name === "agent_complete") {
+            const agent = data.agent as AgentName;
+            const result = data.result as Record<string, unknown>;
+            setStatuses((s) => ({ ...s, [agent]: "complete" }));
+            if (agent === "intake") setBrief(result as unknown as ProjectBrief);
+            if (agent === "research") setResearch(result as unknown as ResearchFindings);
+            if (agent === "strategy") setStrategy(result as unknown as Strategy);
+          } else if (name === "error") {
+            setError((data.message as string) ?? "Error");
+          }
+        },
+        authHeaders(),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -69,7 +76,6 @@ export default function StrategyPage() {
   return (
     <>
       <Nav active="/strategy" />
-
       <div
         className="relative bg-blue-900"
         style={{
@@ -85,8 +91,7 @@ export default function StrategyPage() {
             Go-To-Market Strategy Builder
           </h1>
           <p className="mt-4 text-xl text-blue-100 max-w-xl mx-auto">
-            Positioning, value propositions, and differentiators — the brief
-            CEOs share with their board.
+            Positioning, value propositions, and differentiators — the brief CEOs share with their board.
           </p>
         </div>
       </div>
@@ -117,23 +122,15 @@ export default function StrategyPage() {
               >
                 {running ? "Building strategy…" : "Build strategy →"}
               </button>
-              {running && (
-                <span className="text-sm text-blue-600 animate-pulse">
-                  AI agents are working…
-                </span>
-              )}
+              {running && <span className="text-sm text-blue-600 animate-pulse">AI agents are working…</span>}
             </div>
           </form>
-
           <PipelineProgress agents={AGENTS} statuses={statuses} />
         </div>
 
         {error && (
-          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
+          <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
         )}
-
         {brief && <BriefView brief={brief} />}
         {research && <ResearchView r={research} />}
         {strategy && <StrategyView s={strategy} />}
@@ -143,5 +140,13 @@ export default function StrategyPage() {
         © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
       </footer>
     </>
+  );
+}
+
+export default function StrategyPage() {
+  return (
+    <AuthGuard>
+      <StrategyTool />
+    </AuthGuard>
   );
 }

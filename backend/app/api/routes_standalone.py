@@ -1,11 +1,13 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException
+import jwt
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from fastapi.responses import StreamingResponse
 
 from app.core.db import PlanRepository, get_repository
 from app.core.logging import get_logger
 from app.core.orchestrator import Orchestrator, get_orchestrator
+from app.core.security import decode_access_token
 from app.schemas.intake import IntakeRequest, ProjectBrief
 from app.schemas.lead import LeadCapture, LeadResponse
 from app.schemas.pipeline import RiskInput, StrategyInput
@@ -14,6 +16,17 @@ from app.schemas.strategy import Strategy
 
 router = APIRouter(prefix="/api/standalone", tags=["standalone"])
 logger = get_logger("api.standalone")
+
+
+def _require_user(authorization: str | None = Header(default=None)) -> dict:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login required")
+    try:
+        return decode_access_token(authorization.removeprefix("Bearer "))
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
 def _sse(event: str, data: dict) -> str:
@@ -70,6 +83,7 @@ async def run_research(
 async def run_strategy(
     req: IntakeRequest,
     orch: Orchestrator = Depends(get_orchestrator),
+    _user: dict = Depends(_require_user),
 ) -> StreamingResponse:
     """Paid tier: go-to-market strategy. Runs intake → research → strategy."""
 
@@ -115,6 +129,7 @@ async def run_strategy(
 async def run_risk(
     req: IntakeRequest,
     orch: Orchestrator = Depends(get_orchestrator),
+    _user: dict = Depends(_require_user),
 ) -> StreamingResponse:
     """Paid tier: risk register. Runs intake → research → strategy → risk."""
 
