@@ -49,8 +49,8 @@ const TIER_STYLES: Record<
   { badge: string; bar: string; label: string }
 > = {
   hot: {
-    badge: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/30",
-    bar: "bg-emerald-500",
+    badge: "bg-slate-50 text-emerald-700 ring-1 ring-emerald-500/30",
+    bar: "bg-slate-500",
     label: "HOT — go!",
   },
   warm: {
@@ -102,7 +102,7 @@ function LeadsTool() {
       <Nav active="/leads" />
 
       <div
-        className="relative bg-blue-900"
+        className="relative bg-slate-800"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1920&q=80')",
@@ -110,13 +110,13 @@ function LeadsTool() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-blue-900/80" />
+        <div className="absolute inset-0 bg-slate-900/80" />
         <div className="relative mx-auto max-w-6xl px-6 py-16 text-center">
           <span className="text-5xl mb-4 block">🎯</span>
           <h1 className="text-5xl font-extrabold text-white tracking-tight">
             AI Lead Finder
           </h1>
-          <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="mt-4 text-xl text-slate-200 max-w-2xl mx-auto">
             Describe your ideal customer in plain English. We find real
             businesses, extract decision-makers, score each lead, and draft a
             3-touch outreach sequence.
@@ -127,7 +127,7 @@ function LeadsTool() {
       <main className="mx-auto max-w-6xl w-full px-6 py-12">
         <form
           onSubmit={handleSubmit}
-          className="rounded-2xl border border-blue-100 bg-white shadow-sm p-8"
+          className="rounded-2xl border border-slate-200 bg-white shadow-sm p-8"
         >
           <label className="block text-sm font-semibold text-slate-700 mb-2">
             What kind of leads do you want?
@@ -140,7 +140,7 @@ function LeadsTool() {
             minLength={10}
             disabled={loading}
             placeholder="e.g. Find boutique cafes in Surry Hills for an Instagram growth campaign"
-            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
           />
 
           <div className="mt-5 flex flex-wrap items-end gap-4">
@@ -161,7 +161,7 @@ function LeadsTool() {
             <button
               type="submit"
               disabled={loading || query.trim().length < 10}
-              className="ml-auto rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-blue-800 disabled:opacity-50"
+              className="ml-auto rounded-xl bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800 disabled:opacity-50"
             >
               {loading ? "Hunting…" : "Find leads →"}
             </button>
@@ -188,7 +188,7 @@ function LeadsTool() {
               {[0, 150, 300].map((d) => (
                 <span
                   key={d}
-                  className="h-2 w-2 animate-pulse rounded-full bg-blue-500"
+                  className="h-2 w-2 animate-pulse rounded-full bg-slate-900"
                   style={{ animationDelay: `${d}ms` }}
                 />
               ))}
@@ -226,8 +226,8 @@ function LeadsTool() {
         )}
       </main>
 
-      <footer className="mt-auto bg-blue-900 text-blue-300 text-center py-6 text-sm">
-        © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
+      <footer className="mt-auto bg-slate-800 text-slate-900 text-center py-6 text-sm">
+        © {new Date().getFullYear()} Strategy Business Growth — Powered by Claude AI
       </footer>
     </>
   );
@@ -257,7 +257,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
   const tierStyle = score ? TIER_STYLES[score.tier] : null;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:border-blue-300 hover:shadow-md transition-all">
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:border-slate-400 hover:shadow-md transition-all">
       {tierStyle && <div className={`h-1 w-full ${tierStyle.bar}`} />}
       <div className="p-6">
         <header className="flex items-start justify-between gap-4">
@@ -281,7 +281,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
                   href={lead.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-slate-700 hover:underline"
                 >
                   Website ↗
                 </a>
@@ -305,7 +305,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
           <ul className="mt-4 grid gap-1 text-xs text-slate-600 sm:grid-cols-2">
             {score.reasons.map((reason, i) => (
               <li key={i} className="flex items-start gap-1.5">
-                <span className="mt-1.5 h-1 w-1 rounded-full bg-blue-500 shrink-0" />
+                <span className="mt-1.5 h-1 w-1 rounded-full bg-slate-900 shrink-0" />
                 {reason}
               </li>
             ))}
@@ -313,7 +313,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
         )}
 
         {primaryContact && (
-          <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50/70 p-4 text-sm">
+          <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-sm">
             <p className="font-semibold text-slate-800">
               {primaryContact.name}
               {primaryContact.title && (
@@ -324,7 +324,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
               )}
             </p>
             {primaryContact.email ? (
-              <p className="mt-1 font-mono text-xs text-blue-700">
+              <p className="mt-1 font-mono text-xs text-slate-900">
                 {primaryContact.email}
               </p>
             ) : primaryContact.email_candidates.length > 0 ? (
@@ -344,7 +344,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
         )}
 
         <div className="mt-5">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-900">
             3-touch outreach sequence
           </h4>
           <div className="mt-3 space-y-3">
@@ -354,7 +354,7 @@ function LeadCard({ item }: { item: LeadWithOutreach }) {
                 className="rounded-xl border border-slate-200 bg-slate-50 p-4"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-blue-700">
+                  <span className="font-semibold text-slate-900">
                     Day {touch.day_offset}
                   </span>
                   <span className="text-slate-500">{touch.purpose}</span>

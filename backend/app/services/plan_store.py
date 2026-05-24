@@ -18,8 +18,9 @@ PLANS: dict[str, dict] = {
         "tier": "free",
         "label": "Free",
         "price_usd": 0,
-        "monthly_token_limit": 200_000,
-        "monthly_generation_limit": 10,
+        # Free tier: Haiku only, capped at 5 generations per month
+        "monthly_token_limit": 100_000,
+        "monthly_generation_limit": 5,
         "allowed_models": ["claude-haiku-4-5"],
         "available": True,
     },
@@ -30,7 +31,7 @@ PLANS: dict[str, dict] = {
         "monthly_token_limit": 2_000_000,
         "monthly_generation_limit": 200,
         "allowed_models": ["claude-haiku-4-5", "claude-sonnet-4-5"],
-        "available": False,
+        "available": False,  # Coming soon
     },
     "lab": {
         "tier": "lab",
@@ -43,7 +44,7 @@ PLANS: dict[str, dict] = {
             "claude-sonnet-4-5",
             "claude-opus-4-7",
         ],
-        "available": False,
+        "available": False,  # Coming soon
     },
     "enterprise": {
         "tier": "enterprise",
@@ -56,7 +57,7 @@ PLANS: dict[str, dict] = {
             "claude-sonnet-4-5",
             "claude-opus-4-7",
         ],
-        "available": False,
+        "available": False,  # Coming soon
     },
 }
 

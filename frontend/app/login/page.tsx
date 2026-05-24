@@ -38,18 +38,18 @@ function LoginForm() {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
       {/* Top bar */}
-      <div className="bg-blue-800 px-6 py-4">
+      <div className="bg-slate-800 px-6 py-4">
         <Link href="/" className="flex items-center gap-2 w-fit">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20">
-            <span className="text-sm font-bold text-white">SG</span>
+            <span className="text-sm font-bold text-slate-900">SG</span>
           </div>
-          <span className="text-lg font-bold text-white">StrategyGrowth AI</span>
+          <span className="text-lg font-bold text-slate-900">Strategy Business Growth</span>
         </Link>
       </div>
 
       {/* Hero */}
       <div
-        className="relative bg-blue-900"
+        className="relative bg-slate-800"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80')",
@@ -57,12 +57,12 @@ function LoginForm() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-blue-900/80" />
+        <div className="absolute inset-0 bg-slate-900/80" />
         <div className="relative px-6 py-14 text-center">
           <h1 className="text-4xl font-extrabold text-white">
             {mode === "login" ? "Welcome back" : "Create your account"}
           </h1>
-          <p className="mt-2 text-blue-200">
+          <p className="mt-2 text-slate-600">
             {mode === "login"
               ? "Sign in to access Strategy and Risk Register tools"
               : "Join free — unlock Go-To-Market Strategy and Risk Register"}
@@ -72,7 +72,7 @@ function LoginForm() {
 
       {/* Card */}
       <div className="mx-auto w-full max-w-md px-6 py-10">
-        <div className="rounded-2xl border border-blue-100 bg-white shadow-sm p-8">
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-8">
           {/* Toggle */}
           <div className="flex rounded-xl border border-slate-200 p-1 mb-6">
             {(["login", "register"] as const).map((m) => (
@@ -82,7 +82,7 @@ function LoginForm() {
                 onClick={() => { setMode(m); setError(null); }}
                 className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
                   mode === m
-                    ? "bg-blue-700 text-white"
+                    ? "bg-slate-900 text-slate-900"
                     : "text-slate-500 hover:text-slate-700"
                 }`}
               >
@@ -103,7 +103,7 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
             </div>
             <div>
@@ -118,7 +118,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
             </div>
 
@@ -131,7 +131,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl bg-blue-700 py-3 text-sm font-semibold text-white shadow hover:bg-blue-800 disabled:opacity-50 transition-colors"
+              className="rounded-xl bg-slate-900 py-3 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800 disabled:opacity-50 transition-colors"
             >
               {loading
                 ? mode === "login" ? "Signing in…" : "Creating account…"
@@ -144,7 +144,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(null); }}
-              className="text-blue-600 font-medium hover:underline"
+              className="text-slate-700 font-medium hover:underline"
             >
               {mode === "login" ? "Register free" : "Sign in"}
             </button>
@@ -152,8 +152,8 @@ function LoginForm() {
         </div>
       </div>
 
-      <footer className="mt-auto bg-blue-900 text-blue-300 text-center py-6 text-sm">
-        © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
+      <footer className="mt-auto bg-slate-800 text-slate-900 text-center py-6 text-sm">
+        © {new Date().getFullYear()} Strategy Business Growth — Powered by Claude AI
       </footer>
     </div>
   );

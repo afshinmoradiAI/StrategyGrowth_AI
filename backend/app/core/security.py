@@ -1,23 +1,34 @@
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 import jwt
 from fastapi import Header, HTTPException, status
-from passlib.context import CryptContext
 
 from app.core.settings import get_settings
-
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 _ALGORITHM = "HS256"
 _EXPIRE_DAYS = 30
 
 
 def hash_password(plain: str) -> str:
-    return _pwd_context.hash(plain)
+    # bcrypt has a hard 72-byte limit on passwords — enforce it explicitly
+    pw_bytes = plain.encode("utf-8")
+    if len(pw_bytes) > 72:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Password must be 72 characters or fewer.",
+        )
+    return bcrypt.hashpw(pw_bytes, bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_context.verify(plain, hashed)
+    pw_bytes = plain.encode("utf-8")
+    if len(pw_bytes) > 72:
+        return False
+    try:
+        return bcrypt.checkpw(pw_bytes, hashed.encode("utf-8"))
+    except ValueError:
+        return False
 
 
 def create_access_token(user_id: str, email: str) -> str:

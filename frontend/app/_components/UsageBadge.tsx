@@ -35,14 +35,14 @@ export function UsageBadge() {
       ? "bg-red-500"
       : pct >= 60
       ? "bg-amber-500"
-      : "bg-emerald-500";
+      : "bg-slate-500";
 
   return (
     <div className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="rounded-full bg-blue-700 hover:bg-blue-600 px-3 py-1 text-xs font-semibold text-white"
+        className="rounded-full bg-slate-900 hover:bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-900"
         title="Usage this month"
       >
         {usage.plan.label} · {Math.round(pct)}%

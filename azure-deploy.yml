@@ -1,0 +1,159 @@
+# Azure Container Apps — production deployment
+# Docs: https://learn.microsoft.com/en-us/azure/container-apps/azure-resource-manager-api-spec
+#
+# ─── One-time setup ──────────────────────────────────────────────────────────
+#
+# 1. Login + create resource group:
+#    az login
+#    az group create --name strategygrowth-rg --location australiaeast
+#
+# 2. Create Azure Container Registry (ACR):
+#    az acr create --resource-group strategygrowth-rg \
+#                  --name strategygrowthacr --sku Basic --admin-enabled false
+#
+# 3. Create Container Apps environment:
+#    az containerapp env create --name strategygrowth-env \
+#                               --resource-group strategygrowth-rg \
+#                               --location australiaeast
+#
+# 4. Create Storage Account + File Share for SQLite persistence:
+#    az storage account create --name strategygrowthstorage \
+#                              --resource-group strategygrowth-rg \
+#                              --location australiaeast --sku Standard_LRS
+#    az storage share create --name strategygrowth-data \
+#                            --account-name strategygrowthstorage
+#    az containerapp env storage set --name strategygrowth-env \
+#       --resource-group strategygrowth-rg \
+#       --storage-name strategygrowth-storage \
+#       --azure-file-account-name strategygrowthstorage \
+#       --azure-file-share-name strategygrowth-data \
+#       --access-mode ReadWrite
+#
+# 5. Store secrets in Azure Key Vault (recommended) or as containerapp secrets:
+#    az keyvault create --name strategygrowth-kv --resource-group strategygrowth-rg
+#    az keyvault secret set --vault-name strategygrowth-kv \
+#                           --name anthropic-api-key --value "sk-ant-..."
+#    az keyvault secret set --vault-name strategygrowth-kv \
+#                           --name jwt-secret-key --value "$(openssl rand -hex 32)"
+#
+# ─── Build & push image ──────────────────────────────────────────────────────
+#
+# az acr build --registry strategygrowthacr \
+#              --image strategygrowth-backend:latest \
+#              ./backend
+#
+# ─── Deploy with this file ───────────────────────────────────────────────────
+#
+# Replace <subscription-id> and the keyvault secret IDs below, then:
+#
+# az containerapp create \
+#   --name strategygrowth-backend \
+#   --resource-group strategygrowth-rg \
+#   --yaml azure-deploy.yml
+#
+# Subsequent updates:
+# az containerapp update --name strategygrowth-backend \
+#                        --resource-group strategygrowth-rg \
+#                        --yaml azure-deploy.yml
+
+# ─── Container App spec ──────────────────────────────────────────────────────
+
+location: australiaeast
+identity:
+  type: SystemAssigned   # used to pull from ACR and read from Key Vault
+
+properties:
+  managedEnvironmentId: /subscriptions/<subscription-id>/resourceGroups/strategygrowth-rg/providers/Microsoft.App/managedEnvironments/strategygrowth-env
+
+  configuration:
+    activeRevisionsMode: Single
+
+    ingress:
+      external: true
+      targetPort: 8000
+      transport: auto
+      allowInsecure: false
+      traffic:
+        - latestRevision: true
+          weight: 100
+
+    registries:
+      - server: strategygrowthacr.azurecr.io
+        identity: system
+
+    secrets:
+      - name: anthropic-api-key
+        keyVaultUrl: https://strategygrowth-kv.vault.azure.net/secrets/anthropic-api-key
+        identity: system
+      - name: jwt-secret-key
+        keyVaultUrl: https://strategygrowth-kv.vault.azure.net/secrets/jwt-secret-key
+        identity: system
+      - name: google-places-api-key
+        keyVaultUrl: https://strategygrowth-kv.vault.azure.net/secrets/google-places-api-key
+        identity: system
+
+  template:
+    containers:
+      - name: strategygrowth-backend
+        image: strategygrowthacr.azurecr.io/strategygrowth-backend:latest
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+        env:
+          - name: ANTHROPIC_API_KEY
+            secretRef: anthropic-api-key
+          - name: SECRET_KEY
+            secretRef: jwt-secret-key
+          - name: GOOGLE_PLACES_API_KEY
+            secretRef: google-places-api-key
+          - name: LOG_LEVEL
+            value: INFO
+          - name: DEFAULT_MODEL
+            value: claude-sonnet-4-5
+          - name: MAX_OUTPUT_TOKENS_PER_CALL
+            value: "8192"
+          - name: ENABLE_MESSAGE_CACHE
+            value: "true"
+          - name: RATE_LIMIT_DEFAULT
+            value: 30/minute
+          - name: RATE_LIMIT_ANONYMOUS
+            value: 10/minute
+          - name: AGENT_MAX_RETRIES
+            value: "3"
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          # SQLite path — points to Azure File Share mount below
+          - name: DB_PATH
+            value: /mnt/data/plans.db
+        volumeMounts:
+          - volumeName: sqlite-data
+            mountPath: /mnt/data
+        probes:
+          - type: Liveness
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          - type: Readiness
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+    scale:
+      minReplicas: 1
+      maxReplicas: 3
+      rules:
+        - name: http-scaling
+          http:
+            metadata:
+              concurrentRequests: "20"
+
+    volumes:
+      - name: sqlite-data
+        storageType: AzureFile
+        storageName: strategygrowth-storage

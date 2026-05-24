@@ -77,27 +77,27 @@ function StrategyTool() {
     <>
       <Nav active="/strategy" />
       <div
-        className="relative bg-blue-900"
+        className="relative bg-slate-800"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1551434678-e076c223a692?w=1920&q=80')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-blue-900/80" />
+        <div className="absolute inset-0 bg-slate-900/80" />
         <div className="relative mx-auto max-w-6xl px-6 py-16 text-center">
           <span className="text-5xl mb-4 block">📊</span>
           <h1 className="text-5xl font-extrabold text-white tracking-tight">
             Go-To-Market Strategy Builder
           </h1>
-          <p className="mt-4 text-xl text-blue-100 max-w-xl mx-auto">
+          <p className="mt-4 text-xl text-slate-200 max-w-xl mx-auto">
             Positioning, value propositions, and differentiators — the brief CEOs share with their board.
           </p>
         </div>
       </div>
 
       <main className="mx-auto max-w-6xl w-full px-6 py-12">
-        <div className="rounded-2xl border border-blue-100 bg-white shadow-sm p-8">
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-8">
           <form onSubmit={submit} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">
@@ -111,18 +111,18 @@ function StrategyTool() {
                 required
                 disabled={running}
                 placeholder="e.g. A platform that connects freelance designers with startups…"
-                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
             </div>
             <div className="flex items-center gap-4">
               <button
                 type="submit"
                 disabled={running || input.trim().length < 10}
-                className="rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-blue-800 disabled:opacity-50 transition-colors"
+                className="rounded-xl bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800 disabled:opacity-50 transition-colors"
               >
                 {running ? "Building strategy…" : "Build strategy →"}
               </button>
-              {running && <span className="text-sm text-blue-600 animate-pulse">AI agents are working…</span>}
+              {running && <span className="text-sm text-slate-700 animate-pulse">AI agents are working…</span>}
             </div>
           </form>
           <PipelineProgress agents={AGENTS} statuses={statuses} />
@@ -136,8 +136,8 @@ function StrategyTool() {
         {strategy && <StrategyView s={strategy} />}
       </main>
 
-      <footer className="mt-auto bg-blue-900 text-blue-300 text-center py-6 text-sm">
-        © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
+      <footer className="mt-auto bg-slate-800 text-slate-900 text-center py-6 text-sm">
+        © {new Date().getFullYear()} Strategy Business Growth — Powered by Claude AI
       </footer>
     </>
   );

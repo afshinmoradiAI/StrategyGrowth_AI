@@ -1,0 +1,104 @@
+# AWS App Runner — image-based deploy from ECR
+# Docs: https://docs.aws.amazon.com/apprunner/latest/dg/config-file.html
+#
+# ─── Deploy steps ────────────────────────────────────────────────────────────
+#
+# 1. Create an ECR repo (one-time):
+#    aws ecr create-repository --repository-name strategygrowth-backend --region ap-southeast-2
+#
+# 2. Build & push the image:
+#    ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+#    REGION=ap-southeast-2
+#    aws ecr get-login-password --region $REGION | \
+#      docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$REGION.amazonaws.com
+#    docker build -t strategygrowth-backend ./backend
+#    docker tag strategygrowth-backend:latest \
+#      $ACCOUNT.dkr.ecr.$REGION.amazonaws.com/strategygrowth-backend:latest
+#    docker push $ACCOUNT.dkr.ecr.$REGION.amazonaws.com/strategygrowth-backend:latest
+#
+# 3. Store secrets in AWS Secrets Manager:
+#    aws secretsmanager create-secret --name strategygrowth/anthropic-api-key --secret-string "sk-ant-..."
+#    aws secretsmanager create-secret --name strategygrowth/secret-key --secret-string "$(openssl rand -hex 32)"
+#
+# 4. Create the App Runner service via Console OR CLI:
+#    aws apprunner create-service --cli-input-json file://apprunner-service.json
+#    (use the JSON below — App Runner CLI doesn't accept YAML for image-based services)
+#
+# ─── Service settings reference (apply these in the Console) ─────────────────
+#
+# Image source:           Amazon ECR
+# Image URI:              <account>.dkr.ecr.ap-southeast-2.amazonaws.com/strategygrowth-backend:latest
+# Deployment trigger:     Automatic (re-deploys on every push to :latest)
+# Port:                   8000
+# Health check path:      /health
+# Health check protocol:  HTTP
+# CPU:                    1 vCPU
+# Memory:                 2 GB
+# Auto-scaling:           Min 1 / Max 3 instances, 100 concurrent requests
+#
+# Environment variables (non-secret):
+#   PYTHONUNBUFFERED=1
+#   LOG_LEVEL=INFO
+#   DEFAULT_MODEL=claude-sonnet-4-5
+#   MAX_OUTPUT_TOKENS_PER_CALL=8192
+#   ENABLE_MESSAGE_CACHE=true
+#   RATE_LIMIT_DEFAULT=30/minute
+#   RATE_LIMIT_ANONYMOUS=10/minute
+#   AGENT_MAX_RETRIES=3
+#
+# Environment variables from AWS Secrets Manager (set these as "Reference"):
+#   ANTHROPIC_API_KEY     ←  arn:aws:secretsmanager:ap-southeast-2:<account>:secret:strategygrowth/anthropic-api-key
+#   SECRET_KEY            ←  arn:aws:secretsmanager:ap-southeast-2:<account>:secret:strategygrowth/secret-key
+#   GOOGLE_PLACES_API_KEY ←  optional
+#
+# ─── Persistent storage (SQLite) ─────────────────────────────────────────────
+#
+# App Runner instances are EPHEMERAL — files written to disk vanish on redeploy.
+# For production, ONE of:
+#   (a) RDS PostgreSQL — migrate from SQLite (recommended for >1 user)
+#   (b) EFS mount via VPC connector — keep SQLite, mount at /mnt/data
+#       Then set DB_PATH=/mnt/data/plans.db in the env vars above
+#
+# ─── This file ───────────────────────────────────────────────────────────────
+#
+# The block below is for SOURCE-based deploys (App Runner builds from this repo,
+# not from ECR). Use it ONLY if you switch from "image" source to "source code".
+# For image-based deploys, this file is documentation only.
+
+version: 1.0
+runtime: DOCKER
+
+build:
+  commands:
+    pre-build:
+      - echo "Building strategygrowth-backend from backend/Dockerfile"
+
+run:
+  command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+  network:
+    port: 8000
+    env: PORT
+  env:
+    - name: PYTHONUNBUFFERED
+      value: "1"
+    - name: LOG_LEVEL
+      value: INFO
+    - name: DEFAULT_MODEL
+      value: claude-sonnet-4-5
+    - name: MAX_OUTPUT_TOKENS_PER_CALL
+      value: "8192"
+    - name: ENABLE_MESSAGE_CACHE
+      value: "true"
+    - name: RATE_LIMIT_DEFAULT
+      value: 30/minute
+    - name: RATE_LIMIT_ANONYMOUS
+      value: 10/minute
+    - name: AGENT_MAX_RETRIES
+      value: "3"
+  secrets:
+    - name: ANTHROPIC_API_KEY
+      value-from: arn:aws:secretsmanager:ap-southeast-2:ACCOUNT_ID:secret:strategygrowth/anthropic-api-key
+    - name: SECRET_KEY
+      value-from: arn:aws:secretsmanager:ap-southeast-2:ACCOUNT_ID:secret:strategygrowth/secret-key
+    - name: GOOGLE_PLACES_API_KEY
+      value-from: arn:aws:secretsmanager:ap-southeast-2:ACCOUNT_ID:secret:strategygrowth/google-places-api-key

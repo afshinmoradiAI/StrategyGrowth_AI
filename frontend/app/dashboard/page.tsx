@@ -39,7 +39,7 @@ function Dashboard() {
       <Nav active="/dashboard" />
 
       <div
-        className="relative bg-blue-900"
+        className="relative bg-slate-800"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920&q=80')",
@@ -47,12 +47,12 @@ function Dashboard() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-blue-900/80" />
+        <div className="absolute inset-0 bg-slate-900/80" />
         <div className="relative mx-auto max-w-6xl px-6 py-14 text-center">
           <h1 className="text-5xl font-extrabold text-white tracking-tight">
             Your Project Dashboard
           </h1>
-          <p className="mt-3 text-xl text-blue-100">
+          <p className="mt-3 text-xl text-slate-700">
             All your saved AI-generated strategy plans, in one place.
           </p>
         </div>
@@ -63,7 +63,7 @@ function Dashboard() {
           <h2 className="text-2xl font-bold text-slate-800">Saved Plans</h2>
           <Link
             href="/"
-            className="rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-800"
+            className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800"
           >
             + New Plan
           </Link>
@@ -90,7 +90,7 @@ function Dashboard() {
             </p>
             <Link
               href="/"
-              className="mt-6 inline-block rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-blue-800"
+              className="mt-6 inline-block rounded-xl bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800"
             >
               Create your first plan →
             </Link>
@@ -103,13 +103,13 @@ function Dashboard() {
               <Link
                 key={p.id}
                 href={`/plans/${p.id}`}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-blue-400 hover:shadow-md transition-all"
+                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-slate-500 hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <span className="text-2xl">📊</span>
                   <StatusBadge status={p.status} />
                 </div>
-                <h3 className="font-semibold text-slate-800 group-hover:text-blue-700 line-clamp-2">
+                <h3 className="font-semibold text-slate-800 group-hover:text-slate-900 line-clamp-2">
                   {p.project_name ?? "Untitled project"}
                 </h3>
                 <p className="mt-2 text-xs text-slate-500 line-clamp-3">
@@ -128,8 +128,8 @@ function Dashboard() {
         )}
       </main>
 
-      <footer className="mt-auto bg-blue-900 text-blue-300 text-center py-6 text-sm">
-        © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
+      <footer className="mt-auto bg-slate-800 text-slate-900 text-center py-6 text-sm">
+        © {new Date().getFullYear()} Strategy Business Growth — Powered by Claude AI
       </footer>
     </>
   );

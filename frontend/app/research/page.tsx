@@ -79,20 +79,20 @@ export default function ResearchPage() {
       <Nav active="/research" />
 
       <div
-        className="relative bg-blue-900"
+        className="relative bg-slate-800"
         style={{
           backgroundImage: "url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1920&q=80')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-blue-900/80" />
+        <div className="absolute inset-0 bg-slate-900/80" />
         <div className="relative mx-auto max-w-6xl px-6 py-16 text-center">
           <span className="text-5xl mb-4 block">🔍</span>
           <h1 className="text-5xl font-extrabold text-white tracking-tight">
             Market & Competitor Analysis
           </h1>
-          <p className="mt-4 text-xl text-blue-100 max-w-xl mx-auto">
+          <p className="mt-4 text-xl text-slate-200 max-w-xl mx-auto">
             Free for one project idea — market overview, competitor landscape,
             trends, and benchmarks.
           </p>
@@ -103,7 +103,7 @@ export default function ResearchPage() {
       </div>
 
       <main className="mx-auto max-w-6xl w-full px-6 py-12">
-        <div className="rounded-2xl border border-blue-100 bg-white shadow-sm p-8">
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-8">
           <form onSubmit={submit} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1">
@@ -116,7 +116,7 @@ export default function ResearchPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={running}
                 placeholder="your@email.com"
-                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
             </div>
             <div>
@@ -131,14 +131,14 @@ export default function ResearchPage() {
                 required
                 disabled={running}
                 placeholder="e.g. A SaaS platform that helps small retail businesses manage inventory…"
-                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
               />
             </div>
             <div className="flex items-center gap-4">
               <button
                 type="submit"
                 disabled={running || input.trim().length < 10 || !email}
-                className="rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-blue-800 disabled:opacity-50 transition-colors"
+                className="rounded-xl bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800 disabled:opacity-50 transition-colors"
               >
                 {running ? "Researching…" : "Get free research →"}
               </button>
@@ -163,8 +163,8 @@ export default function ResearchPage() {
         {research && <ResearchView r={research} />}
       </main>
 
-      <footer className="mt-auto bg-blue-900 text-blue-300 text-center py-6 text-sm">
-        © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
+      <footer className="mt-auto bg-slate-800 text-slate-900 text-center py-6 text-sm">
+        © {new Date().getFullYear()} Strategy Business Growth — Powered by Claude AI
       </footer>
     </>
   );

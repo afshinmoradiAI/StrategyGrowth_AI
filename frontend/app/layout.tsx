@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StrategyGrowth AI — AI-Powered Project Planner",
+  title: "Strategy Business Growth — AI Strategy, Roadmap & Growth Platform",
   description:
-    "Turn your idea into a full strategy, roadmap, and risk register in minutes.",
+    "Turn your business idea into a complete strategic plan, qualified sales leads, and ready-to-send outreach — in minutes, not months. Powered by Claude AI.",
 };
 
 export default function RootLayout({

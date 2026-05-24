@@ -157,7 +157,7 @@ function PlanDetail() {
         <>
           {/* Hero */}
           <div
-            className="relative bg-blue-900"
+            className="relative bg-slate-800"
             style={{
               backgroundImage:
                 "url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80')",
@@ -165,28 +165,28 @@ function PlanDetail() {
               backgroundPosition: "center",
             }}
           >
-            <div className="absolute inset-0 bg-blue-900/80" />
+            <div className="absolute inset-0 bg-slate-900/80" />
             <div className="relative mx-auto max-w-6xl px-6 py-14">
-              <p className="text-xs uppercase tracking-widest text-blue-300">
+              <p className="text-xs uppercase tracking-widest text-slate-900">
                 Saved plan · {new Date(plan.created_at).toLocaleDateString()}
               </p>
               <h1 className="mt-2 text-5xl font-extrabold text-white tracking-tight">
                 {plan.brief?.project_name ?? "Untitled Project"}
               </h1>
               {plan.brief?.domain && (
-                <p className="mt-3 text-lg text-blue-200">{plan.brief.domain}</p>
+                <p className="mt-3 text-lg text-slate-600">{plan.brief.domain}</p>
               )}
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   onClick={downloadPdf}
                   disabled={downloading}
-                  className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-800 shadow hover:bg-blue-50 disabled:opacity-50"
+                  className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow hover:bg-slate-50 disabled:opacity-50"
                 >
                   {downloading ? "Generating PDF…" : "📄 Download PDF"}
                 </button>
                 <a
                   href="#chat"
-                  className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-500 ring-1 ring-blue-300"
+                  className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow hover:bg-slate-900 ring-1 ring-slate-400"
                 >
                   💬 Chat with this plan
                 </a>
@@ -204,13 +204,13 @@ function PlanDetail() {
             {/* Chat Section */}
             <section
               id="chat"
-              className="mt-10 rounded-2xl border border-blue-200 bg-white shadow-sm overflow-hidden"
+              className="mt-10 rounded-2xl border border-slate-300 bg-white shadow-sm overflow-hidden"
             >
-              <div className="bg-blue-700 px-6 py-4">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <div className="bg-slate-900 px-6 py-4">
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                   💬 Ask AI about this plan
                 </h2>
-                <p className="text-sm text-blue-100 mt-0.5">
+                <p className="text-sm text-slate-700 mt-0.5">
                   Refine, expand, or run what-if scenarios with full context of your plan.
                 </p>
               </div>
@@ -229,7 +229,7 @@ function PlanDetail() {
                         <button
                           key={q}
                           onClick={() => setChatInput(q)}
-                          className="rounded-full bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-100"
+                          className="rounded-full bg-slate-50 border border-slate-300 px-3 py-1.5 text-xs text-slate-900 hover:bg-slate-100"
                         >
                           {q}
                         </button>
@@ -246,7 +246,7 @@ function PlanDetail() {
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
                         m.role === "user"
-                          ? "bg-blue-700 text-white"
+                          ? "bg-slate-900 text-slate-900"
                           : "bg-slate-100 text-slate-800"
                       }`}
                     >
@@ -259,9 +259,9 @@ function PlanDetail() {
                   <div className="flex justify-start mb-3">
                     <div className="bg-slate-100 rounded-2xl px-4 py-3 text-sm text-slate-500">
                       <span className="inline-flex items-center gap-1">
-                        <span className="h-2 w-2 rounded-full bg-blue-400 animate-bounce" />
-                        <span className="h-2 w-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.15s" }} />
-                        <span className="h-2 w-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "0.3s" }} />
+                        <span className="h-2 w-2 rounded-full bg-slate-800 animate-bounce" />
+                        <span className="h-2 w-2 rounded-full bg-slate-800 animate-bounce" style={{ animationDelay: "0.15s" }} />
+                        <span className="h-2 w-2 rounded-full bg-slate-800 animate-bounce" style={{ animationDelay: "0.3s" }} />
                       </span>
                     </div>
                   </div>
@@ -279,12 +279,12 @@ function PlanDetail() {
                   onChange={(e) => setChatInput(e.target.value)}
                   disabled={chatBusy}
                   placeholder="Ask anything about your plan…"
-                  className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm focus:border-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
                 />
                 <button
                   type="submit"
                   disabled={chatBusy || !chatInput.trim()}
-                  className="rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-800 disabled:opacity-50"
+                  className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-900 shadow hover:bg-slate-800 disabled:opacity-50"
                 >
                   Send
                 </button>
@@ -294,8 +294,8 @@ function PlanDetail() {
         </>
       )}
 
-      <footer className="mt-auto bg-blue-900 text-blue-300 text-center py-6 text-sm">
-        © {new Date().getFullYear()} StrategyGrowth AI — Powered by Claude AI
+      <footer className="mt-auto bg-slate-800 text-slate-900 text-center py-6 text-sm">
+        © {new Date().getFullYear()} Strategy Business Growth — Powered by Claude AI
       </footer>
     </>
   );

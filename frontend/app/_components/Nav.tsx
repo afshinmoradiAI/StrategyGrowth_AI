@@ -9,11 +9,14 @@ import { SettingsDialog } from "./SettingsDialog";
 import { UsageBadge } from "./UsageBadge";
 
 const LINKS = [
-  { href: "/", label: "Plan" },
+  { href: "/", label: "Home" },
+  { href: "/plan", label: "Plan" },
   { href: "/research", label: "Research" },
   { href: "/strategy", label: "Strategy" },
   { href: "/risk", label: "Risk" },
   { href: "/leads", label: "Leads" },
+  { href: "/content", label: "Content" },
+  { href: "/crm", label: "CRM" },
   { href: "/dashboard", label: "Dashboard" },
 ];
 
@@ -33,14 +36,14 @@ export function Nav({ active }: { active: string }) {
 
   return (
     <>
-      <nav className="bg-blue-800 shadow-lg">
+      <nav className="bg-slate-800 shadow-lg">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20">
-              <span className="text-sm font-bold text-white">SG</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-yellow-500 shadow">
+              <span className="text-sm font-bold text-slate-900">SBG</span>
             </div>
-            <span className="text-lg font-bold tracking-tight text-white">
-              StrategyGrowth AI
+            <span className="text-lg font-bold tracking-tight text-white whitespace-nowrap">
+              Strategy Business Growth
             </span>
           </Link>
 
@@ -53,8 +56,8 @@ export function Nav({ active }: { active: string }) {
                   href={l.href}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-white text-blue-800"
-                      : "text-blue-100 hover:bg-blue-700 hover:text-white"
+                      ? "bg-amber-500 text-slate-900"
+                      : "text-slate-200 hover:bg-slate-700 hover:text-amber-400"
                   }`}
                 >
                   {l.label}
@@ -63,21 +66,21 @@ export function Nav({ active }: { active: string }) {
             })}
 
             {email ? (
-              <div className="flex items-center gap-2 ml-2 pl-2 border-l border-blue-600">
+              <div className="flex items-center gap-2 ml-2 pl-2 border-l border-slate-600">
                 <UsageBadge />
                 <button
                   onClick={() => setSettingsOpen(true)}
                   title="Settings"
-                  className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-blue-100 hover:bg-blue-700 hover:text-white transition-colors"
+                  className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-amber-400 transition-colors"
                 >
                   ⚙
                 </button>
-                <span className="text-xs text-blue-200 hidden lg:block">
+                <span className="text-xs text-slate-400 hidden lg:block">
                   {email}
                 </span>
                 <button
                   onClick={logout}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-blue-100 hover:bg-blue-700 hover:text-white transition-colors"
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-amber-400 transition-colors"
                 >
                   Logout
                 </button>
@@ -85,7 +88,7 @@ export function Nav({ active }: { active: string }) {
             ) : (
               <Link
                 href="/login"
-                className="ml-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50 transition-colors"
+                className="ml-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-amber-400 transition-colors"
               >
                 Sign in
               </Link>

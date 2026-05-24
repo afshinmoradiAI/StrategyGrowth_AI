@@ -1,0 +1,48 @@
+{
+  "_comment": "Use with: aws apprunner create-service --cli-input-json file://apprunner-service.json — replace ACCOUNT_ID and REGION (currently ap-southeast-2 / Sydney) before running",
+  "ServiceName": "strategygrowth-backend",
+  "SourceConfiguration": {
+    "ImageRepository": {
+      "ImageIdentifier": "ACCOUNT_ID.dkr.ecr.ap-southeast-2.amazonaws.com/strategygrowth-backend:latest",
+      "ImageRepositoryType": "ECR",
+      "ImageConfiguration": {
+        "Port": "8000",
+        "RuntimeEnvironmentVariables": {
+          "PYTHONUNBUFFERED": "1",
+          "LOG_LEVEL": "INFO",
+          "DEFAULT_MODEL": "claude-sonnet-4-5",
+          "MAX_OUTPUT_TOKENS_PER_CALL": "8192",
+          "ENABLE_MESSAGE_CACHE": "true",
+          "RATE_LIMIT_DEFAULT": "30/minute",
+          "RATE_LIMIT_ANONYMOUS": "10/minute",
+          "AGENT_MAX_RETRIES": "3"
+        },
+        "RuntimeEnvironmentSecrets": {
+          "ANTHROPIC_API_KEY": "arn:aws:secretsmanager:ap-southeast-2:ACCOUNT_ID:secret:strategygrowth/anthropic-api-key",
+          "SECRET_KEY": "arn:aws:secretsmanager:ap-southeast-2:ACCOUNT_ID:secret:strategygrowth/secret-key"
+        }
+      }
+    },
+    "AutoDeploymentsEnabled": true,
+    "AuthenticationConfiguration": {
+      "AccessRoleArn": "arn:aws:iam::ACCOUNT_ID:role/AppRunnerECRAccessRole"
+    }
+  },
+  "InstanceConfiguration": {
+    "Cpu": "1 vCPU",
+    "Memory": "2 GB",
+    "InstanceRoleArn": "arn:aws:iam::ACCOUNT_ID:role/AppRunnerInstanceRole"
+  },
+  "HealthCheckConfiguration": {
+    "Protocol": "HTTP",
+    "Path": "/health",
+    "Interval": 30,
+    "Timeout": 5,
+    "HealthyThreshold": 1,
+    "UnhealthyThreshold": 3
+  },
+  "Tags": [
+    { "Key": "project", "Value": "strategygrowth-ai" },
+    { "Key": "env", "Value": "production" }
+  ]
+}
