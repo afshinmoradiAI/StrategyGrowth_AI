@@ -18,6 +18,9 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY --chown=app:app app ./app
 COPY --chown=app:app .env.example ./
 
+# Create writable data directory for SQLite (both plans.db and growth.db)
+RUN mkdir -p /app/data && chown -R app:app /app
+
 USER app
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1

@@ -5,8 +5,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.core.settings import get_settings as _main_settings
 
+# Default to <project>/data/growth.db locally and /app/data/growth.db in Docker.
+# `parent.parent.parent` resolves to the directory that contains the `app/` package.
 _DEFAULT_DB = (
-    Path(__file__).resolve().parent.parent.parent.parent / "data" / "growth.db"
+    Path(__file__).resolve().parent.parent.parent / "data" / "growth.db"
 )
 
 
