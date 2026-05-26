@@ -1,43 +1,57 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 # Deploy: push to GitHub → Render dashboard → New → Blueprint → connect repo
-# Render auto-reads this file and creates the service.
 #
 # ─── HOBBY (FREE) TIER NOTES ─────────────────────────────────────────────────
 # Render renamed the Free tier to "Hobby" in their dashboard UI, but the
 # blueprint value is still `plan: free`.
 #
-# • Hobby web services SLEEP after 15 minutes of inactivity — first request
-#   after sleep takes ~30 seconds while the container spins back up.
+# • Hobby web services SLEEP after 15 min idle — first request after sleep
+#   takes ~30 seconds while the container spins back up.
 # • Hobby tier provides 512 MB RAM and 0.1 CPU.
-# • PERSISTENT DISKS ARE NOT AVAILABLE on Hobby — SQLite is stored on
-#   ephemeral disk and WILL BE WIPED on every redeploy.
+# • Persistent disks are NOT available — SQLite resets on every redeploy.
 # • For production with persistence, upgrade to `plan: starter` ($7/mo)
-#   and uncomment the `disk:` block at the bottom of this file.
+#   and uncomment the `disk:` block in the backend service.
+#
+# ─── AFTER FIRST DEPLOY ──────────────────────────────────────────────────────
+# Both services will be created automatically. Then:
+#   1. Backend gets URL like: https://strategygrowth-backend.onrender.com
+#   2. Frontend gets URL like: https://strategygrowth-frontend.onrender.com
+#   3. In Render dashboard → strategygrowth-frontend → Environment, set:
+#        NEXT_PUBLIC_API_URL = https://strategygrowth-backend.onrender.com
+#   4. In Render dashboard → strategygrowth-backend → Environment, set:
+#        CORS_ORIGINS = https://strategygrowth-frontend.onrender.com
+#   5. Both services auto-redeploy.
 
 services:
+  # ─── BACKEND (FastAPI) ─────────────────────────────────────────────────────
   - type: web
     name: strategygrowth-backend
     runtime: docker
     rootDir: backend
     dockerfilePath: ./Dockerfile
-    plan: free             # Render Hobby (free) — sleeps after 15 min idle, 512MB RAM
+    plan: free
     healthCheckPath: /health
     autoDeploy: true
 
     envVars:
-      # -- Required (set manually in Render dashboard) --
+      # -- Required: set in Render dashboard after first deploy --
       - key: ANTHROPIC_API_KEY
-        sync: false
+        sync: false           # Add your sk-ant-... key in the dashboard
 
-      # -- Auto-generated secure JWT signing key --
+      # -- Auto-generated secure JWT signing key (Render creates it) --
       - key: SECRET_KEY
         generateValue: true
 
-      # -- Optional: leave blank if not using lead finder --
+      # -- Optional: only needed for Lead Finder (Google Places) --
       - key: GOOGLE_PLACES_API_KEY
         sync: false
 
-      # -- App settings (matches Free plan: Haiku only, 5 generations/month) --
+      # -- CORS: set this after first deploy to your frontend URL --
+      # Example: https://strategygrowth-frontend.onrender.com
+      - key: CORS_ORIGINS
+        sync: false
+
+      # -- App settings (Free plan: Haiku only, 5 generations/month) --
       - key: LOG_LEVEL
         value: INFO
       - key: DEFAULT_MODEL
@@ -54,14 +68,28 @@ services:
         value: "3"
       - key: PYTHONUNBUFFERED
         value: "1"
-      # SQLite path — ephemeral on Free plan (resets on redeploy)
       - key: DB_PATH
         value: /app/data/plans.db
 
-    # ─── Persistent disk (paid plans only) ────────────────────────────────────
-    # Free plan does NOT support disks. Uncomment AFTER upgrading to `starter`:
+    # ─── Persistent disk (paid plans only) ─────────────────────────────────
+    # Uncomment after upgrading to `plan: starter` ($7/mo) for SQLite persistence:
     #
     # disk:
     #   name: strategygrowth-data
     #   mountPath: /app/data
     #   sizeGB: 1
+
+  # ─── FRONTEND (Next.js) ────────────────────────────────────────────────────
+  - type: web
+    name: strategygrowth-frontend
+    runtime: docker
+    rootDir: frontend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    autoDeploy: true
+
+    envVars:
+      # Set this in Render dashboard to your backend URL after first deploy.
+      # Example: https://strategygrowth-backend.onrender.com
+      - key: NEXT_PUBLIC_API_URL
+        sync: false

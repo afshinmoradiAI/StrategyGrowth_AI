@@ -59,9 +59,18 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
+import os
+
+_cors_origins = [
+    o.strip() for o in os.environ.get(
+        "CORS_ORIGINS",
+        "http://localhost:3000,http://localhost:3001",
+    ).split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=_cors_origins,
     allow_methods=["*"],
     allow_headers=["X-API-Key", "X-Model", "X-Request-ID", "Content-Type", "Authorization"],
     expose_headers=["X-Request-ID"],
